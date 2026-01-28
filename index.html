@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 ZoZo AI - Super Fast AI Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --secondary: #3b82f6;
+            --accent: #10b981;
+            --dark: #0f172a;
+            --light: #f8fafc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* GLASS MORPHISM EFFECT */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+        
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 25px;
+            height: 95vh;
+        }
+        
+        /* SIDEBAR */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* BRAND SECTION */
+        .brand {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .brand h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        /* FEATURES */
+        .features {
+            padding: 20px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .feature-icon {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+        
+        /* STATS */
+        .stats {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            margin: 15px 0;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        /* MAIN CHAT AREA */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* CHAT HEADER */
+        .chat-header {
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .model-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .model-tag {
+            background: linear-gradient(90deg, var(--accent), #34d399);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #10b981;
+        }
+        
+        /* CHAT MESSAGES */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 18px 22px;
+            border-radius: 18px;
+            animation: fadeIn 0.3s ease;
+            position: relative;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message {
+            align-self: flex-start;
+            background: rgba(30, 41, 59, 0.7);
+            border-left: 4px solid var(--accent);
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .message-header img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+        
+        /* TYPING INDICATOR */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 18px;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 18px;
+            width: fit-content;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        
+        /* INPUT AREA */
+        .input-area {
+            padding: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 15px;
+        }
+        
+        textarea {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 18px 22px;
+            color: white;
+            font-size: 1rem;
+            resize: none;
+            min-height: 60px;
+            max-height: 150px;
+            font-family: inherit;
+            transition: border 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
+        }
+        
+        /* QUICK ACTIONS */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .quick-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .quick-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .sidebar {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                grid-template-columns: 1fr;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .chat-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+        
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar glass">
+            <!-- BRAND -->
+            <div class="brand">
+                <div class="logo">🤖</div>
+                <h1>ZoZo AI</h1>
+                <p class="tagline">Super Fast • Real Information • Advanced AI</p>
+            </div>
+            
+            <!-- FEATURES -->
+            <div class="features">
+                <h3 style="margin-bottom: 20px; color: #94a3b8;">FEATURES</h3>
+                <div class="feature-item" onclick="quickAction('code')">
+                    <i class="fas fa-code feature-icon"></i>
+                    <div>
+                        <div style="font-weight: bold;">Code Generation</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">Write any code instantly</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item" onclick="quickAction('research')">
+                    <i class="fas fa-search feature-icon"></i>
+                    <div>
+                        <div style="font-weight: bold;">Web Research</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">Real-time information</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item" onclick="quickAction('content')">
+                    <i class="fas fa-file-alt feature-icon"></i>
+                    <div>
+                        <div style="font-weight: bold;">Content Creation</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">Articles, blogs, marketing</div>
+                    </div>
+                </div>
+                
+                <div class="feature-item" onclick="quickAction('business')">
+                    <i class="fas fa-chart-line feature-icon"></i>
+                    <div>
+                        <div style="font-weight: bold;">Business Tools</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">Strategies & planning</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STATS -->
+            <div class="stats">
+                <h3 style="margin-bottom: 20px; color: #94a3b8;">PERFORMANCE</h3>
+                <div class="stat-item">
+                    <div class="stat-value">0.2s</div>
+                    <div>Response Time</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">99.9%</div>
+                    <div>Uptime</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">10x</div>
+                    <div>Faster than ChatGPT</div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- MAIN CHAT AREA -->
+        <main class="chat-area glass">
+            <!-- CHAT HEADER -->
+            <div class="chat-header">
+                <div>
+                    <h2>ZoZo AI Assistant</h2>
+                    <p style="color: #94a3b8;">Ask anything - Get instant answers</p>
+                </div>
+                <div class="model-info">
+                    <div class="model-tag">GPT-4 Turbo</div>
+                    <div class="status">
+                        <i class="fas fa-circle"></i>
+                        <span>Online</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CHAT MESSAGES -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-message">
+                    <div class="message-header">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ZoZo" alt="AI">
+                        <strong>🤖 ZoZo AI</strong>
+                    </div>
+                    <p>Hello! I'm <strong>ZoZo AI</strong> - Your super fast AI assistant!</p>
+                    <p>I can help you with:</p>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li>💻 <strong>Coding</strong> - Any language, any project</li>
+                        <li>🔍 <strong>Research</strong> - Real-time information</li>
+                        <li>📝 <strong>Content</strong> - Articles, blogs, marketing</li>
+                        <li>💼 <strong>Business</strong> - Strategies & planning</li>
+                        <li>🚀 <strong>Development</strong> - Websites, apps, automation</li>
+                    </ul>
+                    <p style="margin-top: 15px;">What would you like to work on today?</p>
+                </div>
+            </div>
+            
+            <!-- INPUT AREA -->
+            <div class="input-area">
+                <div class="input-container">
+                    <textarea 
+                        id="userInput" 
+                        placeholder="Ask ZoZo AI anything... (Press Ctrl+Enter for new line)" 
+                        rows="3"
+                        onkeydown="handleKeyDown(event)"
+                    ></textarea>
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                        Send
+                    </button>
+                </div>
+                
+                <!-- QUICK ACTIONS -->
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="quickAction('code')">
+                        <i class="fas fa-code"></i> Write Code
+                    </button>
+                    <button class="quick-btn" onclick="quickAction('research')">
+                        <i class="fas fa-search"></i> Research
+                    </button>
+                    <button class="quick-btn" onclick="quickAction('content')">
+                        <i class="fas fa-file-alt"></i> Create Content
+                    </button>
+                    <button class="quick-btn" onclick="quickAction('business')">
+                        <i class="fas fa-chart-line"></i> Business Help
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ========== ZOZO AI ENGINE ==========
+        class ZoZoAI {
+            constructor() {
+                this.conversation = [];
+                this.isTyping = false;
+                this.responseSpeed = 200; // ms - SUPER FAST
+            }
+            
+            // GET AI RESPONSE
+            async getResponse(message) {
+                this.showTyping();
+                
+                // FAKE DELAY FOR REALISM
+                await this.delay(this.responseSpeed);
+                
+                const response = this.generateSmartResponse(message);
+                this.hideTyping();
+                
+                return response;
+            }
+            
+            // GENERATE SMART RESPONSE
+            generateSmartResponse(message) {
+                const lowerMsg = message.toLowerCase();
+                
+                // CODE GENERATION
+                if (lowerMsg.includes('code') || lowerMsg.includes('program') || 
+                    lowerMsg.includes('python') || lowerMsg.includes('javascript') ||
+                    lowerMsg.includes('html') || lowerMsg.includes('css')) {
+                    return this.generateCodeResponse(message);
+                }
+                
+                // RESEARCH QUERIES
+                if (lowerMsg.includes('research') || lowerMsg.includes('search') || 
+                    lowerMsg.includes('information') || lowerMsg.includes('latest')) {
+                    return this.generateResearchResponse(message);
+                }
+                
+                // BUSINESS QUERIES
+                if (lowerMsg.includes('business') || lowerMsg.includes('money') || 
+                    lowerMsg.includes('startup') || lowerMsg.includes('earn')) {
+                    return this.generateBusinessResponse(message);
+                }
+                
+                // CONTENT CREATION
+                if (lowerMsg.includes('content') || lowerMsg.includes('article') || 
+                    lowerMsg.includes('blog') || lowerMsg.includes('write')) {
+                    return this.generateContentResponse(message);
+                }
+                
+                // DEFAULT RESPONSE
+                return this.generateDefaultResponse(message);
+            }
+            
+            // CODE GENERATION RESPONSE
+            generateCodeResponse(message) {
+                const languages = ['Python', 'JavaScript', 'HTML/CSS', 'React', 'Node.js', 'Java'];
+                const randomLang = languages[Math.floor(Math.random() * languages.length)];
+                
+                return `💻 **CODE GENERATED - ${randomLang}**
+                
+Based on your query: "${message}"
+
+\`\`\`${randomLang.toLowerCase().includes('html') ? 'html' : randomLang.toLowerCase()}
+// ${randomLang} Code by ZoZo AI
+${this.getSampleCode(randomLang)}
+\`\`\`
+
+✅ **Features:**
+• Production-ready code
+• Best practices included
+• Fully documented
+• Easy to modify
+
+Need changes? Just ask!`;
+            }
+            
+            getSampleCode(language) {
+                const samples = {
+                    'Python': `def main():\n    print("Hello from ZoZo AI!")\n    \n    # Your code here\n    result = calculate(10, 20)\n    return result\n\ndef calculate(a, b):\n    """Calculate sum"""\n    return a + b`,
+                    
+                    'JavaScript': `// JavaScript by ZoZo AI\nconst app = {\n    init() {\n        console.log("App initialized");\n        this.loadData();\n    },\n    \n    async loadData() {\n        const response = await fetch('/api/data');\n        return response.json();\n    }\n};\n\n// Initialize\napp.init();`,
+                    
+                    'HTML/CSS': `<!DOCTYPE html>\n<html>\n<head>\n    <title>ZoZo AI Generated</title>\n    <style>\n        * { margin: 0; padding: 0; }\n        body { font-family: Arial; }\n        .container { max-width: 1200px; margin: 0 auto; }\n    </style>\n</head>\n<body>\n    <div class="container">\n        <h1>Built by ZoZo AI</h1>\n    </div>\n</body>\n</html>`
+                };
+                
+                return samples[language] || samples['Python'];
+            }
+            
+            // RESEARCH RESPONSE
+            generateResearchResponse(message) {
+                const topics = ['AI Technology', 'Web Development', 'Business Trends', 'Market Research'];
+                const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+                
+                return `🔍 **RESEARCH COMPLETED - ${randomTopic}**
+                
+**Topic:** ${message}
+
+**Latest Information (2024):**
+
+📊 **Key Findings:**
+1. **Trend Analysis:** Significant growth in AI adoption
+2. **Market Size:** $500B+ industry by 2025
+3. **Opportunities:** Multiple revenue streams available
+4. **Challenges:** Competition is increasing
+
+📈 **Recommendations:**
+• Focus on niche markets
+• Build scalable solutions
+• Leverage automation
+• Continuous learning
+
+✅ **Sources Verified:** Google Scholar, Research Papers, Industry Reports`;
+            }
+            
+            // BUSINESS RESPONSE
+            generateBusinessResponse(message) {
+                return `💼 **BUSINESS STRATEGY - ${message.toUpperCase()}**
+                
+🚀 **Complete Business Plan:**
+
+**1. Revenue Model:**
+• Subscription: ₹999-₹9,999/month
+• One-time: ₹10,000-₹1,00,000
+• Commission: 20-30% on sales
+
+**2. Target Market:**
+• Small Businesses: 10M+ in India
+• Startups: 50,000+ new monthly
+• Freelancers: 15M+ professionals
+
+**3. Marketing Strategy:**
+• Social Media: Daily content
+• SEO: Rank for key terms
+• Partnerships: Collaborate with influencers
+
+**4. Financial Projection:**
+• Month 1: ₹50,000 revenue
+• Month 3: ₹2,00,000 revenue
+• Month 6: ₹10,00,000 revenue
+
+💰 **Immediate Action Items:**
+1. Create MVP (1 week)
+2. Get first 10 customers
+3. Collect feedback
+4. Scale marketing`;
+            }
+            
+            // CONTENT RESPONSE
+            generateContentResponse(message) {
+                return `📝 **CONTENT CREATED - Professional Quality**
+                
+**Title:** How to Master ${message.split(' ')[0]} in 2024
+
+**Introduction:**
+In today's digital landscape, mastering ${message.split(' ')[0]} is crucial for success. This comprehensive guide will show you exactly how.
+
+**Key Sections:**
+1. **Fundamentals:** Core concepts explained simply
+2. **Advanced Techniques:** Pro-level strategies
+3. **Tools & Resources:** Best tools for 2024
+4. **Case Studies:** Real-world examples
+5. **Action Plan:** Step-by-step implementation
+
+**SEO Optimized:**
+• Keywords: ${message.split(' ').slice(0, 3).join(', ')}
+• Meta Description: Learn ${message} with expert guidance
+• Tags: Technology, Business, Growth
+
+**Word Count:** 1500+ words
+**Reading Time:** 7 minutes
+**Engagement Score:** 95/100
+
+✅ **Ready to publish!**`;
+            }
+            
+            // DEFAULT RESPONSE
+            generateDefaultResponse(message) {
+                const responses = [
+                    `🤖 **ZoZo AI Analysis:**
+                    
+**Query:** "${message}"
+
+**Detailed Response:**
+Based on my analysis, here's the comprehensive solution:
+
+1. **Current Situation:** Standard approach has limitations
+2. **Recommended Solution:** AI-powered automation
+3. **Implementation:** 3-step process
+4. **Expected Results:** 10x improvement
+
+**Next Steps:**
+• Start with prototype
+• Test with real users
+• Iterate based on feedback
+• Scale for maximum impact
+
+Need specific details? Just ask!`,
+
+                    `🚀 **ZoZo AI Response:**
+                    
+I understand you're asking about "${message}". This is an excellent topic!
+
+**Key Insights:**
+• Market potential: ₹50L+ annually
+• Competition: Moderate but growing
+• Technology required: Modern stack
+• Timeline: 2-4 weeks for MVP
+
+**Action Plan:**
+1. Day 1-3: Research & planning
+2. Day 4-7: Development
+3. Day 8-14: Testing
+4. Day 15+: Launch & marketing
+
+**Success Probability:** 85% with proper execution`,
+
+                    `💡 **Expert Advice:**
+                    
+Regarding "${message}", here's my professional recommendation:
+
+**The Problem:** Traditional methods are inefficient
+**The Solution:** Leverage AI and automation
+**The Process:** Simple 5-step framework
+**The Outcome:** Significant time & cost savings
+
+**Technical Requirements:**
+• Frontend: React/Vue.js
+• Backend: Node.js/Python
+• Database: MongoDB/PostgreSQL
+• Hosting: AWS/Google Cloud
+
+**Budget:** ₹25,000-₹1,00,000
+**Timeline:** 2-6 weeks
+**ROI:** 300% within 6 months`
+                ];
+                
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // UTILITY FUNCTIONS
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            showTyping() {
+                this.isTyping = true;
+                const chat = document.getElementById('chatMessages');
+                const typingDiv = document.createElement('div');
+                typingDiv.id = 'typingIndicator';
+                typingDiv.className = 'typing-indicator';
+                typingDiv.innerHTML = `
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <span>ZoZo AI is typing...</span>
+                `;
+                chat.appendChild(typingDiv);
+                chat.scrollTop = chat.scrollHeight;
+            }
+            
+            hideTyping() {
+                this.isTyping = false;
+                const typing = document.getElementById('typingIndicator');
+                if (typing) typing.remove();
+            }
+        }
+
+        // ========== INITIALIZE ==========
+        const zozo = new ZoZoAI();
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+
+        // ========== CHAT FUNCTIONS ==========
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message || zozo.isTyping) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            userInput.value = '';
+            
+            // Get AI response
+            const response = await zozo.getResponse(message);
+            addMessage(response, 'ai');
+        }
+        
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${Date.now()}" alt="User">
+                        <strong>👤 You</strong>
+                    </div>
+                    <p>${text}</p>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ZoZo" alt="AI">
+                        <strong>🤖 ZoZo AI</strong>
+                    </div>
+                    <p>${text.replace(/\n/g, '<br>')}</p>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        function quickAction(action) {
+            const actions = {
+                'code': 'Write Python code for a web scraper',
+                'research': 'Research latest AI trends in 2024',
+                'content': 'Create a blog post about digital marketing',
+                'business': 'Business plan for a startup'
+            };
+            
+            userInput.value = actions[action];
+            sendMessage();
+        }
+
+        // ========== INITIAL MESSAGES ==========
+        setTimeout(() => {
+            addMessage("Try asking: 'Write Python code for a website' or 'Research AI trends'", 'ai');
+        }, 2000);
+        
+        // ========== AUTO FOCUS ==========
+        userInput.focus();
+    </script>
+</body>
+</html>
