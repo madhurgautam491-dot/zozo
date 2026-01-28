@@ -1,0 +1,36 @@
+
+## 🛠️ Setup & Installation
+
+### Local Setup
+1. **Clone or download** the repository
+2. **Open `index.html`** in any modern browser
+3. **No installation required** - It works offline!
+
+### GitHub Pages Deployment
+1. **Create new repository** on GitHub
+2. **Upload all files** to the repository
+3. **Go to Settings** → **Pages**
+4. **Select source**: `main` branch
+5. **Save** - Your site is live at: `https://username.github.io/repo-name`
+
+## 🔧 Configuration
+
+### API Integration (Optional)
+For advanced features, connect your AI API:
+
+1. Click **"Connect API"** in the sidebar
+2. Enter your API key from:
+   - [OpenAI](https://openai.com)
+   - [Hugging Face](https://huggingface.co)
+   - [Cohere](https://cohere.com)
+3. Enjoy enhanced AI capabilities
+
+### Customization
+- **Change colors**: Edit CSS variables in `style.css`
+- **Modify responses**: Update `script.js`
+- **Add features**: Extend the JavaScript classes
+- **Change content**: Edit HTML files
+
+## 💻 Usage Examples
+
+### Code Generation
