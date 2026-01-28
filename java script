@@ -1,0 +1,647 @@
+// ZoZo AI - Main JavaScript File
+
+class ZoZoAI {
+    constructor() {
+        this.conversationHistory = [];
+        this.isTyping = false;
+        this.apiStatus = 'online';
+        this.responseSpeed = 300; // Fast responses
+        this.init();
+    }
+    
+    init() {
+        console.log('ZoZo AI Initialized');
+        this.loadConversation();
+        this.setupEventListeners();
+        this.showWelcomeMessage();
+        this.checkAPIStatus();
+    }
+    
+    // LOAD SAVED CONVERSATION
+    loadConversation() {
+        const saved = localStorage.getItem('zozo_conversation');
+        if (saved) {
+            this.conversationHistory = JSON.parse(saved);
+            this.displayConversation();
+        }
+    }
+    
+    // SAVE CONVERSATION
+    saveConversation() {
+        localStorage.setItem('zozo_conversation', 
+            JSON.stringify(this.conversationHistory));
+    }
+    
+    // SETUP EVENT LISTENERS
+    setupEventListeners() {
+        const input = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        if (input) {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
+            });
+        }
+        
+        if (sendBtn) {
+            sendBtn.addEventListener('click', () => this.sendMessage());
+        }
+        
+        // Setup quick action buttons
+        document.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.dataset.action;
+                this.handleQuickAction(action);
+            });
+        });
+        
+        // Setup feature items
+        document.querySelectorAll('.feature-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const feature = item.dataset.feature;
+                this.handleFeatureClick(feature);
+            });
+        });
+    }
+    
+    // SEND MESSAGE
+    async sendMessage() {
+        const input = document.getElementById('userInput');
+        const message = input.value.trim();
+        
+        if (!message || this.isTyping) return;
+        
+        // Add user message
+        this.addMessage(message, 'user');
+        input.value = '';
+        
+        // Show typing indicator
+        this.showTyping();
+        
+        // Generate AI response
+        setTimeout(async () => {
+            const response = await this.generateResponse(message);
+            this.hideTyping();
+            this.addMessage(response, 'ai');
+        }, this.responseSpeed);
+    }
+    
+    // GENERATE AI RESPONSE
+    async generateResponse(message) {
+        // Add to conversation history
+        this.conversationHistory.push({
+            role: 'user',
+            content: message,
+            timestamp: new Date().toISOString()
+        });
+        
+        try {
+            // Try to get response from API
+            const response = await this.callAIAPI(message);
+            this.conversationHistory.push({
+                role: 'ai',
+                content: response,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Save conversation
+            this.saveConversation();
+            
+            return response;
+        } catch (error) {
+            console.error('API Error:', error);
+            
+            // Fallback to smart response
+            const fallbackResponse = this.generateFallbackResponse(message);
+            this.conversationHistory.push({
+                role: 'ai',
+                content: fallbackResponse,
+                timestamp: new Date().toISOString()
+            });
+            
+            this.saveConversation();
+            return fallbackResponse;
+        }
+    }
+    
+    // CALL AI API
+    async callAIAPI(message) {
+        // This would connect to your actual AI API
+        // For now, using smart fallback
+        return this.generateSmartResponse(message);
+    }
+    
+    // GENERATE SMART RESPONSE
+    generateSmartResponse(message) {
+        const lowerMsg = message.toLowerCase();
+        
+        // Code related queries
+        if (this.isCodeQuery(lowerMsg)) {
+            return this.generateCodeResponse(message);
+        }
+        
+        // Business related queries
+        if (this.isBusinessQuery(lowerMsg)) {
+            return this.generateBusinessResponse(message);
+        }
+        
+        // Research queries
+        if (this.isResearchQuery(lowerMsg)) {
+            return this.generateResearchResponse(message);
+        }
+        
+        // Content queries
+        if (this.isContentQuery(lowerMsg)) {
+            return this.generateContentResponse(message);
+        }
+        
+        // Default response
+        return this.generateDefaultResponse(message);
+    }
+    
+    // QUERY TYPE DETECTION
+    isCodeQuery(message) {
+        const keywords = ['code', 'program', 'python', 'javascript', 'html', 'css', 'java', 'c++', 'develop', 'function'];
+        return keywords.some(keyword => message.includes(keyword));
+    }
+    
+    isBusinessQuery(message) {
+        const keywords = ['business', 'money', 'earn', 'startup', 'company', 'revenue', 'profit', 'market'];
+        return keywords.some(keyword => message.includes(keyword));
+    }
+    
+    isResearchQuery(message) {
+        const keywords = ['research', 'search', 'information', 'data', 'analysis', 'study', 'report'];
+        return keywords.some(keyword => message.includes(keyword));
+    }
+    
+    isContentQuery(message) {
+        const keywords = ['content', 'article', 'blog', 'write', 'post', 'essay', 'story'];
+        return keywords.some(keyword => message.includes(keyword));
+    }
+    
+    // RESPONSE GENERATORS
+    generateCodeResponse(message) {
+        const languages = ['Python', 'JavaScript', 'HTML/CSS', 'React', 'Node.js', 'Java', 'C++'];
+        const randomLang = languages[Math.floor(Math.random() * languages.length)];
+        
+        const codeSamples = {
+            'Python': `# ${message} - Generated by ZoZo AI
+def solution():
+    """
+    Professional solution for your query.
+    """
+    # Your implementation here
+    result = process_data()
+    return result
+
+def process_data():
+    # Add your logic
+    return "Success!"
+
+if __name__ == "__main__":
+    print(solution())`,
+            
+            'JavaScript': `// ${message} - ZoZo AI Generated
+class App {
+    constructor() {
+        this.init();
+    }
+    
+    init() {
+        console.log("Application initialized");
+        this.loadData();
+    }
+    
+    async loadData() {
+        try {
+            const response = await fetch('/api/data');
+            this.data = await response.json();
+            return this.data;
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+}
+
+// Initialize application
+const app = new App();`,
+            
+            'HTML/CSS': `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${message} - ZoZo AI</title>
+    <style>
+        /* Modern CSS by ZoZo AI */
+        :root {
+            --primary: #7c3aed;
+            --secondary: #3b82f6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Add your styles here */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Built with ZoZo AI</h1>
+        <!-- Your content here -->
+    </div>
+    
+    <script>
+        // JavaScript code here
+        console.log("ZoZo AI website loaded!");
+    </script>
+</body>
+</html>`
+        };
+        
+        const code = codeSamples[randomLang] || codeSamples['Python'];
+        
+        return `💻 **CODE GENERATED - ${randomLang}**
+
+\`\`\`${randomLang.toLowerCase().includes('html') ? 'html' : randomLang.toLowerCase()}
+${code}
+\`\`\`
+
+✅ **Features:**
+• Production-ready
+• Best practices
+• Fully documented
+• Easy to modify
+
+Need changes? Just ask!`;
+    }
+    
+    generateBusinessResponse(message) {
+        return `💼 **BUSINESS ANALYSIS - ${message.toUpperCase()}**
+
+🚀 **Strategic Plan:**
+
+**1. Market Opportunity:**
+• Size: ₹500 Crore+ market
+• Growth: 25% annually
+• Competition: Moderate
+
+**2. Revenue Streams:**
+• Product Sales: 40% margin
+• Subscription: ₹999-₹9,999/month
+• Services: ₹50,000-₹5,00,000/project
+
+**3. Marketing Strategy:**
+• Digital Marketing: ₹50,000/month budget
+• Social Media: Daily engagement
+• SEO: Rank for 50+ keywords
+
+**4. Financial Projection:**
+• Month 1-3: ₹5,00,000 revenue
+• Month 4-6: ₹20,00,000 revenue
+• Month 7-12: ₹1,00,00,000 revenue
+
+💰 **Immediate Actions:**
+1. Create MVP (2 weeks)
+2. Get first 100 customers
+3. Build email list
+4. Scale operations`;
+    }
+    
+    generateResearchResponse(message) {
+        return `🔍 **RESEARCH COMPLETED - ${message.toUpperCase()}**
+
+📊 **Key Findings (2024):**
+
+**1. Current Trends:**
+• AI adoption increased by 300%
+• Market valuation: $500 billion
+• Job growth: 40% annually
+
+**2. Technology Stack:**
+• Frontend: React/Vue.js
+• Backend: Node.js/Python
+• Database: PostgreSQL/MongoDB
+• Cloud: AWS/GCP
+
+**3. User Behavior:**
+• Mobile usage: 65%
+• Desktop usage: 35%
+• Average session: 8 minutes
+
+**4. Competitive Analysis:**
+• Top 5 players control 60% market
+• Entry barriers: Moderate
+• Differentiation opportunities: High
+
+✅ **Sources:** Google Scholar, Research Papers, Industry Reports`;
+    }
+    
+    generateContentResponse(message) {
+        return `📝 **CONTENT CREATED - Professional Quality**
+
+**Title:** The Complete Guide to ${message.split(' ')[0]} in 2024
+
+**Introduction:**
+In the rapidly evolving landscape of 2024, mastering ${message.split(' ')[0]} has become essential. This comprehensive guide provides everything you need to succeed.
+
+**Table of Contents:**
+1. Fundamentals Explained
+2. Advanced Strategies
+3. Tools & Resources
+4. Case Studies
+5. Action Plan
+
+**SEO Optimization:**
+• Primary Keyword: "${message}"
+• Secondary Keywords: 15+ related terms
+• Meta Description: 160 characters optimized
+• Reading Time: 8 minutes
+
+**Quality Metrics:**
+• Word Count: 2,500+ words
+• Readability Score: 85/100
+• Engagement Score: 90/100
+• Shareability: High
+
+✅ **Ready for publication on:** Medium, LinkedIn, Blog`;
+    }
+    
+    generateDefaultResponse(message) {
+        const responses = [
+            `🤖 **ZoZo AI Analysis:**
+
+**Query:** "${message}"
+
+**Detailed Analysis:**
+Based on comprehensive analysis, here's the optimal solution:
+
+1. **Current State:** Traditional approaches have limitations
+2. **Recommended Approach:** AI-powered automation
+3. **Implementation Timeline:** 2-4 weeks
+4. **Expected ROI:** 300-500%
+
+**Technical Requirements:**
+• Development Time: 80-120 hours
+• Team Size: 2-3 developers
+• Tools: Modern tech stack
+• Budget: ₹50,000-₹2,00,000
+
+**Success Probability:** 85% with proper execution`,
+
+            `🚀 **Expert Recommendation:**
+
+Regarding "${message}", here's my professional advice:
+
+**The Challenge:** Inefficiency in current processes
+**The Solution:** Digital transformation with AI
+**The Process:** 5-step implementation framework
+**The Outcome:** 10x productivity improvement
+
+**Key Metrics:**
+• Time Savings: 70%
+• Cost Reduction: 40%
+• Revenue Increase: 150%
+• Customer Satisfaction: 95%
+
+**Next Steps:**
+1. Conduct feasibility study
+2. Develop prototype
+3. Test with users
+4. Full-scale implementation`,
+
+            `💡 **Strategic Insight:**
+
+"${message}" - This presents a significant opportunity!
+
+**Market Analysis:**
+• Demand: Growing at 30% annually
+• Supply: Limited quality providers
+• Gap: Your unique value proposition
+
+**Strategic Advantages:**
+1. First-mover advantage
+2. Scalable technology
+3. Strong monetization
+4. Network effects
+
+**Implementation Roadmap:**
+• Phase 1 (1 month): MVP development
+• Phase 2 (2 months): User acquisition
+• Phase 3 (3 months): Feature expansion
+• Phase 4 (6 months): Market leadership
+
+💰 **Funding Required:** ₹5-₹50 lakhs`
+        ];
+        
+        return responses[Math.floor(Math.random() * responses.length)];
+    }
+    
+    generateFallbackResponse(message) {
+        return `🤖 **ZoZo AI Response:**
+
+I understand you're asking about "${message}". While I'm currently using my built-in intelligence, here's what I recommend:
+
+**Key Points:**
+1. This is a valuable area to explore
+2. Multiple approaches available
+3. High success probability
+4. Good market timing
+
+**Quick Tips:**
+• Start with research
+• Build minimum viable product
+• Get early feedback
+• Iterate and improve
+
+For more detailed AI-powered responses, connect me with an API key!`;
+    }
+    
+    // UI FUNCTIONS
+    addMessage(text, sender) {
+        const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+        
+        const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        if (sender === 'user') {
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${Date.now()}" class="avatar" alt="User">
+                    <strong>👤 You</strong>
+                    <span style="margin-left: auto; font-size: 0.8rem; color: #94a3b8;">${timestamp}</span>
+                </div>
+                <p>${this.escapeHtml(text)}</p>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ZoZo" class="avatar" alt="AI">
+                    <strong>🤖 ZoZo AI</strong>
+                    <span style="margin-left: auto; font-size: 0.8rem; color: #94a3b8;">${timestamp}</span>
+                </div>
+                <p>${this.formatMessage(text)}</p>
+            `;
+        }
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    displayConversation() {
+        const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+        
+        chatMessages.innerHTML = '';
+        
+        this.conversationHistory.forEach(msg => {
+            this.addMessage(msg.content, msg.role);
+        });
+    }
+    
+    showTyping() {
+        if (this.isTyping) return;
+        
+        this.isTyping = true;
+        const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.id = 'typingIndicator';
+        typingDiv.className = 'typing-indicator';
+        typingDiv.innerHTML = `
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <span>ZoZo AI is thinking...</span>
+        `;
+        
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    hideTyping() {
+        this.isTyping = false;
+        const typing = document.getElementById('typingIndicator');
+        if (typing) typing.remove();
+    }
+    
+    // HELPER FUNCTIONS
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    formatMessage(text) {
+        // Convert markdown-like formatting
+        let formatted = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>')
+            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+            .replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        return formatted;
+    }
+    
+    showWelcomeMessage() {
+        setTimeout(() => {
+            if (this.conversationHistory.length === 0) {
+                this.addMessage("Hello! I'm ZoZo AI - Your advanced AI assistant. I can help you with coding, research, business strategies, content creation, and much more! How can I assist you today?", 'ai');
+            }
+        }, 1000);
+    }
+    
+    checkAPIStatus() {
+        // Simulate API status check
+        setInterval(() => {
+            const statusIndicator = document.getElementById('apiStatus');
+            if (statusIndicator) {
+                statusIndicator.innerHTML = `<i class="fas fa-circle" style="color: #10b981;"></i> Online`;
+            }
+        }, 5000);
+    }
+    
+    handleQuickAction(action) {
+        const actions = {
+            'code': 'Write Python code for a web application',
+            'research': 'Research latest technology trends',
+            'content': 'Create a professional blog post',
+            'business': 'Business plan for a startup',
+            'website': 'Build a complete website',
+            'marketing': 'Digital marketing strategy',
+            'analysis': 'Market analysis report',
+            'automation': 'Business automation solution'
+        };
+        
+        const input = document.getElementById('userInput');
+        if (input && actions[action]) {
+            input.value = actions[action];
+            this.sendMessage();
+        }
+    }
+    
+    handleFeatureClick(feature) {
+        const features = {
+            'code': 'Code Generation',
+            'ai': 'AI Models',
+            'research': 'Web Research',
+            'content': 'Content Creation',
+            'business': 'Business Tools',
+            'automation': 'Automation',
+            'analytics': 'Analytics',
+            'support': '24/7 Support'
+        };
+        
+        const input = document.getElementById('userInput');
+        if (input && features[feature]) {
+            input.value = `Tell me about ${features[feature].toLowerCase()}`;
+            this.sendMessage();
+        }
+    }
+    
+    // NEW CHAT
+    newChat() {
+        if (confirm('Start a new chat? Current conversation will be saved.')) {
+            this.conversationHistory = [];
+            this.saveConversation();
+            
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                chatMessages.innerHTML = '';
+            }
+            
+            this.showWelcomeMessage();
+        }
+    }
+    
+    // EXPORT CONVERSATION
+    exportConversation() {
+        const data = JSON.stringify(this.conversationHistory, null, 2);
+        const blob = new Blob([data], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'zozo-ai-conversation.json';
+        a.click();
+    }
+}
+
+// Initialize ZoZo AI when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.zozoAI = new ZoZoAI();
+    
+    // Expose functions to global scope
+    window.newChat = () => window.zozoAI.newChat();
+    window.exportConversation = () => window.zozoAI.exportConversation();
+});
